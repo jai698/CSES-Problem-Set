@@ -1,0 +1,138 @@
+#include <bits/stdc++.h>
+using namespace std;
+//--------------------------------------------------------------//
+typedef vector<int> vi;
+typedef vector<vector<int>> vvi;
+typedef vector<long long> vl;
+typedef vector<vector<long long>> vvl;
+typedef vector<bool> vb;
+typedef vector<string> vs;
+typedef vector<char> vc;
+typedef unordered_map<int,int> umii;
+typedef priority_queue<int> maxh;
+typedef priority_queue<int,vi,greater<int>> minh;
+typedef vector<vector<bool>> vvb;
+typedef map<int, int> mii;
+typedef map<long long, long long> mll;
+typedef pair<int, int> pii;
+typedef pair<long long, long long> pll;
+typedef unsigned long long ull;
+typedef long double ld;
+ 
+#define ll long long
+#define amax(a, b)          a = max(a, b)
+#define amin(a, b)          a = min(a, b)
+#define mp(a,b)             make_pair(a,b)
+#define pb(n)               push_back(n)
+#define ff                  first
+#define ss                  second
+#define bn                  begin()
+#define prt(v)              for(auto i:v) cout << i << " "; cout << "\n";
+#define en                  end()
+#define nl                  ("\n")
+#define sp(n)               cout<<setprecision(n)<<fixed;
+#define loop(i, a, b)       for (int i = a; i < b; i++)
+#define loopr(i, a, b)      for (int i = b; i < a; i--)
+#define all(a)              a.begin(), a.end()
+#define sz(x)               ((int)(x).size())
+ 
+// ----------------------------------------------------------------//
+const long long MOD = 1000000007;
+const int MAX_N = 500001;
+const double PI = 3.14159265358979;
+const double INF=1e15;
+ 
+/*---------------------------------------------------------------------------*/ 
+bool revsort(ll a, ll b){return (a > b);}
+void reverseStr(string&str){int n=str.length();for(int i=0;i<n/2;i++){swap(str[i],str[n-i-1]);}}
+bool ispal(string x){int n=x.size();for(int i=0;i<n/2;i++){if(x[i]!=x[n-i-1])return 0;}return 1;}
+void printall(vi v){for(auto ele:v)cout<<ele<<" ";}
+int modadd(int a, int b,int m){a%=m;b%=m;return (a+b)%m;}
+int modmul(int a, int b,int m){a%=m;b%=m;return (a*b)%m;}
+int modsub(int a, int b,int m){a%=m;b%=m;return (a-b)%m;}
+int gcd(int a, int b){if(b==0)return a;return gcd(b,a%b);}
+int expo(int a, int n,int m){int res=1;while(n){if(n&1){res=modmul(res,a,m);--n;}else{a=modmul(a,a,m);n>>=1;}}return res;}
+int expo(int a, int n){int res=1;while(n){if(n&1){res=res*a;--n;}else{a=a*a;n>>=1;}}return res;}
+/*---------------------------------------------------------------------------*/ 
+ 
+ 
+ 
+// // =============== !!! ~ ~ ~ code starts here ~ ~ ~ !!! ===============
+
+int solveUsingRec(string arr[],int i,int j,int row,int col){
+    if (i >= row || j >= col) {
+        return 0;
+    }
+    if (i == row - 1 && j == col - 1) {
+        return (arr[i][j] == '.') ? 1 : 0;
+    }
+    if (arr[i][j] == '*') {
+        return 0;
+    }
+    int ans = (solveUsingRec(arr, i + 1, j, row, col) % MOD + solveUsingRec(arr, i, j + 1, row, col) % MOD) % MOD;
+    return ans;
+}
+
+int solveUsingMem(string arr[],int i,int j,int row,int col,vector<vector<int>> &dp){
+    if (i >= row || j >= col) {
+        return 0;
+    }
+    if (i == row - 1 && j == col - 1) {
+        return (arr[i][j] == '.') ? 1 : 0;
+    }
+    if (arr[i][j] == '*') {
+        return 0;
+    }
+    if(dp[i][j] != -1){
+        return dp[i][j];
+    }
+    int ans = (solveUsingMem(arr, i + 1, j, row, col,dp) % MOD + solveUsingMem(arr, i, j + 1, row, col,dp) % MOD) % MOD;
+    dp[i][j] = ans;
+    return dp[i][j];
+}
+
+int solveUsingTab(string arr[], int row, int col) {
+    vector<vector<int>> dp(row, vector<int>(col, 0));
+
+    dp[row - 1][col - 1] = (arr[row - 1][col - 1] == '.') ? 1 : 0;
+
+    for (int i = row - 2; i >= 0; i--) {
+        if (arr[i][col - 1] != '*')
+            dp[i][col - 1] = dp[i + 1][col - 1];
+    }
+
+    for (int j = col - 2; j >= 0; j--) {
+        if (arr[row - 1][j] != '*')
+            dp[row - 1][j] = dp[row - 1][j + 1];
+    }
+
+    for (int i = row - 2; i >= 0; i--) {
+        for (int j = col - 2; j >= 0; j--) {
+            if (arr[i][j] != '*') {
+                dp[i][j] = (dp[i + 1][j] + dp[i][j + 1]) % MOD;
+            }
+        }
+    }
+
+    return dp[0][0];
+}
+
+
+
+int main() {
+    int n;
+    cin >> n;
+    
+    string arr[n];
+    for(int i=0;i<n;i++){
+        cin>>arr[i];
+    }
+    
+    // int ans = solveUsingRec(arr,0,0,n,n);
+    // vector<vector<int>> dp(n+1,vector<int>(n+1,-1));
+    // int ans = solveUsingMem(arr,0,0,n,n,dp);
+    int ans = solveUsingTab(arr,n,n);
+    cout<<ans<<nl;
+        
+    return 0;
+}
